@@ -1,4 +1,4 @@
-
+require 'journey'
 class Oystercard
   attr_reader :balance, :limit, :entry_station, :exit_station, :journeys
 
@@ -17,7 +17,7 @@ class Oystercard
     raise "top up limit of #{LIMIT} exceeded" if @balance + value > LIMIT
     @balance += value
   end
-
+  
   def touch_in(entry_station)
     raise "balance too low" if @balance < MINIMUM_FARE
     @in_journey = true
