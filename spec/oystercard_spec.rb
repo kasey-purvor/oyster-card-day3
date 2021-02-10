@@ -1,10 +1,16 @@
 require 'oystercard'
 
 describe Oystercard do
-  let(:station) {double :station}
+  let(:entry_station) {double :station}
+  let(:exit_station) {double :station}
   
-  it 'has a balance of 0 by default' do
-    expect(subject.balance).to eq(0)
+  context "when initialized" do 
+    it 'has a balance of 0 by default' do
+      expect(subject.balance).to eq(0)
+    end
+    it 'has a empty list of journey' do
+      expect(subject.journeys).to be_empty
+    end
   end
   it 'has a limit' do
     expect(Oystercard::LIMIT).to eq(90)
@@ -35,11 +41,11 @@ describe Oystercard do
     end
     it 'changes in_journey status to true' do
       subject.top_up(Oystercard::LIMIT)
-      subject.touch_in(station)
+      subject.touch_in(entry_station)
       expect(subject).to be_in_journey
     end
     it 'should raise an error if the balance is less than the minimum fare' do
-      expect { subject.touch_in(station) }.to raise_error("balance too low")  
+      expect { subject.touch_in(entry_station) }.to raise_error("balance too low")  
     end
   end
 
@@ -52,18 +58,27 @@ describe Oystercard do
   describe '#touch_out' do
     before do 
       subject.top_up(Oystercard::LIMIT)
-      subject.touch_in(station)
+      subject.touch_in(entry_station)
     end 
     it 'responds to a touch_out method' do
       expect(subject).to respond_to(:touch_out)
     end
     it 'changes in_journey status to false' do
-      subject.touch_out
+      subject.touch_out(exit_station)
       expect(subject).not_to be_in_journey
     end
     it "deducts the fare from the balance of touch out" do
-      expect { subject.touch_out }.to change{subject.balance}.by(-Oystercard::MINIMUM_FARE)
+      expect { subject.touch_out(exit_station) }.to change{subject.balance}.by(-Oystercard::MINIMUM_FARE)
     end  
+    it 'stores exit station' do
+      subject.touch_out(exit_station)
+      expect(subject.exit_station).to eq exit_station
+    end
+     let(:journey) { {entry_station: entry_station, exit_station: exit_station} }
+     it 'stores a journey in journeys' do 
+      subject.touch_out(exit_station)
+      expect(subject.journeys).to include journey      
+     end
   end
   
   describe '#entry_station?' do 
@@ -71,8 +86,8 @@ describe Oystercard do
       subject.top_up(Oystercard::LIMIT)
     end
     it "remembers the entry station" do 
-      subject.touch_in(station)
-      expect(subject.entry_station).to eq(station)
+      subject.touch_in(entry_station)
+      expect(subject.entry_station).to eq(entry_station)
     end 
   end
 end
