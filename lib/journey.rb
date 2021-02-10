@@ -1,7 +1,6 @@
-reguire 'oystercard'
- class Journey
+class Journey
 
 
 
 
- end 
+end 
