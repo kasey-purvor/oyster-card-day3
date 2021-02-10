@@ -1,5 +1,5 @@
 require 'oystercard'
-
+require 'station'
 describe Oystercard do
   let(:entry_station) {double :station}
   let(:exit_station) {double :station}
@@ -90,4 +90,5 @@ describe Oystercard do
       expect(subject.entry_station).to eq(entry_station)
     end 
   end
+    
 end
